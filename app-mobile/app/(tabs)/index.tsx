@@ -1,55 +1,140 @@
-import { ExternalLink } from '@tamagui/lucide-icons'
-import { Anchor, H2, Paragraph, XStack, YStack } from 'tamagui'
-import { ToastControl } from 'components/CurrentToast'
+// app/(tabs)/index.tsx
+import { useState } from "react";
+import {
+  H2,
+  Paragraph,
+  Text,
+  Separator,
+  XStack,
+  Label,
+  RadioGroup,
+  YStack,
+} from "tamagui";
+import { useAuth } from "components/providers/AuthProvider";
+import { ScreenScrollView } from "components/ScreenScrollView";
 
 export default function TabOneScreen() {
+  const { user, token, authenticated, loading } = useAuth();
+  const [satisfaction, setSatisfaction] = useState<string>("4");
+
+  const statusLabel = loading
+    ? "Ładowanie..."
+    : authenticated
+    ? "Zalogowany"
+    : "Niezalogowany";
+
   return (
-    <YStack flex={1} items="center" gap="$8" px="$10" pt="$5" bg="$background">
-      <H2>Tamagui + Expo</H2>
+    <ScreenScrollView>
+      {/* Nagłówek */}
+      <H2 text="left">Profil użytkownika</H2>
+      <Paragraph text="left" color="$color10">
+        Podgląd danych aktualnie zalogowanego użytkownika.
+      </Paragraph>
 
-      <ToastControl />
+      <Separator />
 
-      <XStack
-        items="center"
-        justify="center"
-        flexWrap="wrap"
-        gap="$1.5"
-        position="absolute"
-        b="$8"
-      >
-        <Paragraph fontSize="$5">Add</Paragraph>
+      {/* Karta z danymi użytkownika */}
+      <UserCard statusLabel={statusLabel} email={user?.email} token={token} />
 
-        <Paragraph fontSize="$5" px="$2" py="$1" color="$blue10" bg="$blue5">
-          tamagui.config.ts
-        </Paragraph>
+      {/* Ankieta satysfakcji */}
+      <SatisfactionCard
+        satisfaction={satisfaction}
+        onChange={setSatisfaction}
+      />
+    </ScreenScrollView>
+  );
+}
 
-        <Paragraph fontSize="$5">to root and follow the</Paragraph>
+function UserCard({
+  statusLabel,
+  email,
+  token,
+}: {
+  statusLabel: string;
+  email?: string | null;
+  token: string | null;
+}) {
+  return (
+    <YStack
+      bg="$background"
+      borderColor="$borderColor"
+      borderWidth={1}
+      rounded="$4"
+      p="$4"
+      gap="$2"
+    >
+      <Paragraph fontSize="$3">
+        <Text fontWeight="700">Status: </Text>
+        {statusLabel}
+      </Paragraph>
 
-        <XStack
-          items="center"
-          gap="$1.5"
-          px="$2"
-          py="$1"
-          rounded="$3"
-          bg="$green5"
-          hoverStyle={{ bg: '$green6' }}
-          pressStyle={{ bg: '$green4' }}
-        >
-          <Anchor
-            href="https://tamagui.dev/docs/core/configuration"
-            textDecorationLine="none"
-            color="$green10"
-            fontSize="$5"
-          >
-            Configuration guide
-          </Anchor>
-          <ExternalLink size="$1" color="$green10" />
-        </XStack>
+      <Paragraph fontSize="$3">
+        <Text fontWeight="700">Email: </Text>
+        {email ?? "—"}
+      </Paragraph>
 
-        <Paragraph fontSize="$5" text="center">
-          to configure your themes and tokens.
-        </Paragraph>
-      </XStack>
+      <Paragraph fontSize="$2" color="$color10">
+        <Text fontWeight="700">Token: </Text>
+        {token ?? "—"}
+      </Paragraph>
     </YStack>
-  )
+  );
+}
+
+function SatisfactionCard({
+  satisfaction,
+  onChange,
+}: {
+  satisfaction: string;
+  onChange: (val: string) => void;
+}) {
+  return (
+    <YStack
+      bg="$background"
+      borderColor="$borderColor"
+      borderWidth={1}
+      rounded="$4"
+      p="$4"
+      gap="$3"
+    >
+      <Paragraph text="left" fontSize="$3" fontWeight="700">
+        Jak bardzo jesteś zadowolony z aplikacji?
+      </Paragraph>
+
+      <RadioGroup
+        aria-labelledby="satisfaction-group"
+        name="satisfaction"
+        value={satisfaction}
+        onValueChange={onChange}
+      >
+        <YStack gap="$2">
+          <RadioOption value="1" label="1 – Bardzo niezadowolony" />
+          <RadioOption value="2" label="2 – Raczej niezadowolony" />
+          <RadioOption value="3" label="3 – Jest OK" />
+          <RadioOption value="4" label="4 – Zadowolony" />
+          <RadioOption value="5" label="5 – Bardzo zadowolony" />
+        </YStack>
+      </RadioGroup>
+
+      <Paragraph fontSize="$2" color="$color10">
+        Aktualnie wybrano: <Text fontWeight="700">{satisfaction}/5</Text>
+      </Paragraph>
+    </YStack>
+  );
+}
+
+function RadioOption({ value, label }: { value: string; label: string }) {
+  const id = `satisfaction-${value}`;
+
+  return (
+    <XStack width="100%" items="center" gap="$2">
+      <RadioGroup.Item id={id} value={value} size="$3">
+        <RadioGroup.Indicator />
+      </RadioGroup.Item>
+
+      <Label htmlFor={id} size="$3">
+        {label}
+      </Label>
+    </XStack>
+  );
 }

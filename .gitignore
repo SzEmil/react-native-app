@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+
+# expo
+.expo/
+.expo-shared/
+
+# builds
+dist/
+build/
+web-build/
+.android/
+.ios/
+*.apk
+*.aab
+
+# metro / cache
+.expo/
+.expo-shared/
+.expo-dev/
+.expo-packager-cache/
+.expo-web-cache/
+.cache/
+.tmp/
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# env
+.env
+.env.*
